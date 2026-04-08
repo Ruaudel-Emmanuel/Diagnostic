@@ -1,0 +1,311 @@
+DIAGNOSTIC_MAPPING = {
+    "meta": {
+        "name": "diagnostic_mapping_facturation_electronique_2026",
+        "version": "1.0.0",
+        "description": "Mapping de diagnostic pour questionnaire de préparation à la réforme française de facturation électronique 2026-2027.",
+        "sources": ["web:124", "web:158", "web:195", "web:201", "web:191", "web:193", "web:194", "web:197"]
+    },
+    "questions": {
+        "Q01": {
+            "field": "company_size",
+            "type": "single_choice",
+            "answers": {
+                "micro": {"score_delta": 0, "flags_add": ["profile_micro", "emission_due_2027", "reception_due_2026"], "flags_remove": [], "actions_add": ["explain_calendar_micro"], "notes": ""},
+                "tpe": {"score_delta": 0, "flags_add": ["profile_tpe", "emission_due_2027", "reception_due_2026"], "flags_remove": [], "actions_add": ["explain_calendar_tpe"], "notes": ""},
+                "pme": {"score_delta": 0, "flags_add": ["profile_pme", "emission_due_2027", "reception_due_2026"], "flags_remove": [], "actions_add": ["explain_calendar_pme"], "notes": ""},
+                "eti": {"score_delta": 0, "flags_add": ["profile_eti", "emission_due_2026", "reception_due_2026", "ereporting_due_2026"], "flags_remove": [], "actions_add": ["explain_calendar_eti"], "notes": ""},
+                "grande_entreprise": {"score_delta": 0, "flags_add": ["profile_ge", "emission_due_2026", "reception_due_2026", "ereporting_due_2026"], "flags_remove": [], "actions_add": ["explain_calendar_ge"], "notes": ""}
+            }
+        },
+        "Q02": {
+            "field": "business_sector",
+            "type": "single_choice",
+            "answers": {
+                "commerce_artisanat": {"score_delta": 0, "flags_add": ["sector_goods_possible"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "services_b2b": {"score_delta": 0, "flags_add": ["sector_services_possible"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "profession_liberale": {"score_delta": 0, "flags_add": ["sector_services_possible"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "industrie_production": {"score_delta": 0, "flags_add": ["sector_goods_possible"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "autre": {"score_delta": 0, "flags_add": ["sector_other"], "flags_remove": [], "actions_add": [], "notes": ""}
+            }
+        },
+        "Q03": {
+            "field": "vat_status",
+            "type": "single_choice",
+            "answers": {
+                "reel_normal": {"score_delta": 1, "flags_add": ["vat_known"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "reel_simplifie": {"score_delta": 1, "flags_add": ["vat_known"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "franchise_base": {"score_delta": 0, "flags_add": ["vat_franchise_base", "reception_due_2026"], "flags_remove": [], "actions_add": ["explain_franchise_base_scope"], "notes": ""},
+                "non_ou_ne_sait_pas": {"score_delta": -1, "flags_add": ["vat_unknown"], "flags_remove": [], "actions_add": ["clarify_vat_status"], "notes": ""}
+            }
+        },
+        "Q04": {
+            "field": "annual_b2b_invoice_volume",
+            "type": "single_choice",
+            "answers": {
+                "lt_100": {"score_delta": 0, "flags_add": ["low_volume"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "100_1000": {"score_delta": 0, "flags_add": ["medium_volume"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "1000_10000": {"score_delta": 0, "flags_add": ["high_volume"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "gt_10000": {"score_delta": 0, "flags_add": ["very_high_volume"], "flags_remove": [], "actions_add": ["recommend_automation_review"], "notes": ""}
+            }
+        },
+        "Q05": {
+            "field": "customer_mix",
+            "type": "multi_choice",
+            "answers": {
+                "b2b_france": {"score_delta": 1, "flags_add": ["has_b2b_fr_domestic", "einvoicing_scope"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "b2c_france": {"score_delta": 0, "flags_add": ["has_b2c_france", "ereporting_scope"], "flags_remove": [], "actions_add": ["review_ereporting_process"], "notes": ""},
+                "ue": {"score_delta": 0, "flags_add": ["has_eu_customers", "ereporting_or_special_flows"], "flags_remove": [], "actions_add": ["review_crossborder_flows"], "notes": ""},
+                "hors_ue": {"score_delta": 0, "flags_add": ["has_non_eu_customers", "ereporting_or_special_flows"], "flags_remove": [], "actions_add": ["review_crossborder_flows"], "notes": ""}
+            }
+        },
+        "Q06": {
+            "field": "domestic_b2b_revenue_share",
+            "type": "single_choice",
+            "answers": {
+                "lt_25": {"score_delta": 0, "flags_add": [], "flags_remove": [], "actions_add": [], "notes": ""},
+                "25_50": {"score_delta": 0, "flags_add": [], "flags_remove": [], "actions_add": [], "notes": ""},
+                "50_75": {"score_delta": 1, "flags_add": ["strong_b2b_dependency"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "gt_75": {"score_delta": 1, "flags_add": ["very_strong_b2b_dependency"], "flags_remove": [], "actions_add": ["prioritize_einvoicing_readiness"], "notes": ""}
+            }
+        },
+        "Q07": {
+            "field": "operation_nature_main",
+            "type": "single_choice",
+            "answers": {
+                "biens": {"score_delta": 0, "flags_add": ["goods_flow"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "services": {"score_delta": 0, "flags_add": ["services_flow"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "mixte": {"score_delta": 1, "flags_add": ["mixed_flow"], "flags_remove": [], "actions_add": ["ensure_operation_nature_mapping"], "notes": ""}
+            }
+        },
+        "Q08": {
+            "field": "invoicing_tool",
+            "type": "single_choice",
+            "answers": {
+                "logiciel_facturation": {"score_delta": 1, "flags_add": ["tool_exists"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "erp_logiciel_metier": {"score_delta": 1, "flags_add": ["tool_exists", "tool_complex_environment"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "excel_word": {"score_delta": -2, "flags_add": ["tool_manual", "blocking_risk"], "flags_remove": [], "actions_add": ["replace_manual_tooling"], "notes": ""},
+                "papier_carnet": {"score_delta": -3, "flags_add": ["tool_paper", "blocking_risk"], "flags_remove": [], "actions_add": ["adopt_digital_invoicing_tool"], "notes": ""},
+                "autre": {"score_delta": 0, "flags_add": ["tool_other"], "flags_remove": [], "actions_add": [], "notes": ""}
+            }
+        },
+        "Q09": {
+            "field": "current_invoice_format",
+            "type": "single_choice",
+            "answers": {
+                "papier": {"score_delta": -3, "flags_add": ["paper_flow", "blocking_risk"], "flags_remove": [], "actions_add": ["digitize_invoice_flow"], "notes": ""},
+                "pdf_email": {"score_delta": -1, "flags_add": ["pdf_only_flow"], "flags_remove": [], "actions_add": ["move_beyond_pdf_only"], "notes": ""},
+                "structured_format": {"score_delta": 3, "flags_add": ["structured_ready"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "mixed": {"score_delta": 0, "flags_add": ["mixed_current_formats"], "flags_remove": [], "actions_add": [], "notes": ""}
+            }
+        },
+        "Q10": {
+            "field": "tool_compatibility_2026",
+            "type": "single_choice",
+            "answers": {
+                "yes_ready": {"score_delta": 3, "flags_add": ["tool_compatible"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "update_announced": {"score_delta": 1, "flags_add": ["tool_pending_update"], "flags_remove": [], "actions_add": ["confirm_editor_roadmap"], "notes": ""},
+                "no": {"score_delta": -3, "flags_add": ["tool_incompatible", "blocking_risk"], "flags_remove": [], "actions_add": ["plan_tool_migration"], "notes": ""},
+                "unknown": {"score_delta": -2, "flags_add": ["tool_compat_unknown", "blocking_risk"], "flags_remove": [], "actions_add": ["contact_editor_for_compatibility"], "notes": ""}
+            }
+        },
+        "Q11": {
+            "field": "invoicing_process_defined",
+            "type": "single_choice",
+            "answers": {
+                "yes": {"score_delta": 1, "flags_add": ["process_defined"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "partial": {"score_delta": 0, "flags_add": ["process_partial"], "flags_remove": [], "actions_add": ["formalize_process"], "notes": ""},
+                "no": {"score_delta": -1, "flags_add": ["process_missing"], "flags_remove": [], "actions_add": ["formalize_process"], "notes": ""}
+            }
+        },
+        "Q12": {
+            "field": "customer_siren_coverage",
+            "type": "single_choice",
+            "answers": {
+                "all": {"score_delta": 3, "flags_add": ["siren_ready"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "partial": {"score_delta": 0, "flags_add": ["siren_partial"], "flags_remove": [], "actions_add": ["complete_customer_siren_collection"], "notes": ""},
+                "none": {"score_delta": -3, "flags_add": ["siren_missing", "blocking_risk"], "flags_remove": [], "actions_add": ["launch_customer_siren_collection"], "notes": ""},
+                "unknown": {"score_delta": -2, "flags_add": ["siren_unknown", "blocking_risk"], "flags_remove": [], "actions_add": ["audit_customer_master_data"], "notes": ""}
+            }
+        },
+        "Q13A": {
+            "field": "delivery_address_if_different",
+            "type": "single_choice",
+            "answers": {
+                "always": {"score_delta": 1, "flags_add": ["delivery_address_ready"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "sometimes": {"score_delta": 0, "flags_add": ["delivery_address_partial"], "flags_remove": [], "actions_add": ["standardize_delivery_address_capture"], "notes": ""},
+                "never": {"score_delta": -2, "flags_add": ["delivery_address_missing"], "flags_remove": [], "actions_add": ["standardize_delivery_address_capture"], "notes": ""}
+            }
+        },
+        "Q13B": {
+            "field": "operation_nature_on_invoice",
+            "type": "single_choice",
+            "answers": {
+                "yes": {"score_delta": 1, "flags_add": ["operation_nature_ready"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "no": {"score_delta": -2, "flags_add": ["operation_nature_missing"], "flags_remove": [], "actions_add": ["add_operation_nature_to_invoice"], "notes": ""},
+                "unknown": {"score_delta": -1, "flags_add": ["operation_nature_unknown"], "flags_remove": [], "actions_add": ["review_invoice_fields"], "notes": ""}
+            }
+        },
+        "Q13C": {
+            "field": "vat_on_debits_mention",
+            "type": "single_choice",
+            "answers": {
+                "yes": {"score_delta": 1, "flags_add": ["vat_debits_mention_ready"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "no": {"score_delta": -1, "flags_add": ["vat_debits_mention_missing"], "flags_remove": [], "actions_add": ["verify_vat_on_debits_obligation"], "notes": ""},
+                "not_applicable": {"score_delta": 0, "flags_add": ["vat_debits_not_applicable"], "flags_remove": [], "actions_add": [], "notes": ""}
+            }
+        },
+        "Q14": {
+            "field": "vat_breakdown_by_rate",
+            "type": "single_choice",
+            "answers": {
+                "yes": {"score_delta": 1, "flags_add": ["vat_breakdown_ready"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "no": {"score_delta": -2, "flags_add": ["vat_breakdown_missing"], "flags_remove": [], "actions_add": ["fix_vat_breakdown_per_rate"], "notes": ""},
+                "unknown": {"score_delta": -1, "flags_add": ["vat_breakdown_unknown"], "flags_remove": [], "actions_add": ["audit_invoice_tax_fields"], "notes": ""}
+            }
+        },
+        "Q15": {
+            "field": "platform_choice",
+            "type": "single_choice",
+            "answers": {
+                "chosen": {"score_delta": 3, "flags_add": ["platform_chosen"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "evaluating": {"score_delta": 1, "flags_add": ["platform_in_progress"], "flags_remove": [], "actions_add": ["finalize_platform_selection"], "notes": ""},
+                "no": {"score_delta": -3, "flags_add": ["platform_missing", "blocking_risk"], "flags_remove": [], "actions_add": ["select_platform"], "notes": ""}
+            }
+        },
+        "Q16A": {
+            "field": "platform_handles_issuance",
+            "type": "single_choice",
+            "condition": "has_b2b_fr_domestic == true",
+            "answers": {
+                "yes": {"score_delta": 2, "flags_add": ["issuance_flow_ready"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "no": {"score_delta": -2, "flags_add": ["issuance_flow_missing"], "flags_remove": [], "actions_add": ["configure_issuance_flow"], "notes": ""},
+                "unknown": {"score_delta": -1, "flags_add": ["issuance_flow_unknown"], "flags_remove": [], "actions_add": ["validate_platform_issuance_scope"], "notes": ""}
+            }
+        },
+        "Q16B": {
+            "field": "platform_handles_reception",
+            "type": "single_choice",
+            "answers": {
+                "yes": {"score_delta": 2, "flags_add": ["reception_flow_ready"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "no": {"score_delta": -3, "flags_add": ["reception_flow_missing", "blocking_risk"], "flags_remove": [], "actions_add": ["configure_reception_flow"], "notes": ""},
+                "unknown": {"score_delta": -1, "flags_add": ["reception_flow_unknown"], "flags_remove": [], "actions_add": ["validate_platform_reception_scope"], "notes": ""}
+            }
+        },
+        "Q16C": {
+            "field": "platform_handles_ereporting",
+            "type": "single_choice",
+            "condition": "has_b2c_france == true or has_eu_customers == true or has_non_eu_customers == true",
+            "answers": {
+                "yes": {"score_delta": 2, "flags_add": ["ereporting_ready"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "no": {"score_delta": -2, "flags_add": ["ereporting_missing"], "flags_remove": [], "actions_add": ["configure_ereporting"], "notes": ""},
+                "unknown": {"score_delta": -1, "flags_add": ["ereporting_unknown"], "flags_remove": [], "actions_add": ["validate_ereporting_scope"], "notes": ""}
+            }
+        },
+        "Q17": {
+            "field": "pilot_tests_done",
+            "type": "single_choice",
+            "answers": {
+                "yes": {"score_delta": 2, "flags_add": ["tests_done"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "planned": {"score_delta": 0, "flags_add": ["tests_planned"], "flags_remove": [], "actions_add": ["schedule_pilot_tests"], "notes": ""},
+                "no": {"score_delta": -1, "flags_add": ["tests_missing"], "flags_remove": [], "actions_add": ["schedule_pilot_tests"], "notes": ""}
+            }
+        },
+        "Q18": {
+            "field": "teams_informed",
+            "type": "single_choice",
+            "answers": {
+                "trained": {"score_delta": 1, "flags_add": ["teams_trained"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "informed_lightly": {"score_delta": 0, "flags_add": ["teams_partially_informed"], "flags_remove": [], "actions_add": ["reinforce_internal_communication"], "notes": ""},
+                "no": {"score_delta": -1, "flags_add": ["teams_not_informed"], "flags_remove": [], "actions_add": ["run_awareness_session"], "notes": ""}
+            }
+        },
+        "Q19A": {
+            "field": "flow_mapping_done",
+            "type": "single_choice",
+            "answers": {
+                "yes": {"score_delta": 1, "flags_add": ["flow_mapping_ready"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "in_progress": {"score_delta": 0, "flags_add": ["flow_mapping_in_progress"], "flags_remove": [], "actions_add": ["complete_flow_mapping"], "notes": ""},
+                "no": {"score_delta": -1, "flags_add": ["flow_mapping_missing"], "flags_remove": [], "actions_add": ["complete_flow_mapping"], "notes": ""}
+            }
+        },
+        "Q19B": {
+            "field": "internal_procedures_updated",
+            "type": "single_choice",
+            "answers": {
+                "yes": {"score_delta": 1, "flags_add": ["procedures_updated"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "in_progress": {"score_delta": 0, "flags_add": ["procedures_update_in_progress"], "flags_remove": [], "actions_add": ["finalize_internal_procedures"], "notes": ""},
+                "no": {"score_delta": -1, "flags_add": ["procedures_not_updated"], "flags_remove": [], "actions_add": ["finalize_internal_procedures"], "notes": ""}
+            }
+        },
+        "Q20": {
+            "field": "self_assessed_readiness",
+            "type": "scale",
+            "answers": {
+                "1": {"score_delta": -2, "flags_add": ["self_declared_beginner"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "2": {"score_delta": -1, "flags_add": ["self_declared_low_readiness"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "3": {"score_delta": 0, "flags_add": ["self_declared_mid_readiness"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "4": {"score_delta": 1, "flags_add": ["self_declared_good_readiness"], "flags_remove": [], "actions_add": [], "notes": ""},
+                "5": {"score_delta": 1, "flags_add": ["self_declared_high_readiness"], "flags_remove": [], "actions_add": [], "notes": ""}
+            }
+        }
+    },
+    "blocking_rules": [
+        {"id": "missing_platform", "when": "platform_missing == true", "force_level_min": "en_retard"},
+        {"id": "no_reception_capability", "when": "reception_flow_missing == true", "force_level_min": "en_retard"},
+        {"id": "incompatible_or_unknown_tool", "when": "tool_incompatible == true or tool_compat_unknown == true", "force_level_min": "en_retard"},
+        {"id": "missing_customer_siren", "when": "siren_missing == true", "force_level_min": "en_retard"},
+        {"id": "paper_or_manual_tooling", "when": "tool_paper == true or tool_manual == true", "force_level_min": "en_retard"},
+        {"id": "missing_ereporting_for_relevant_flows", "when": "(has_b2c_france == true or has_eu_customers == true or has_non_eu_customers == true) and ereporting_missing == true", "force_level_min": "en_retard"}
+    ],
+    "score_bands": {
+        "en_retard": {"min": -99, "max": 4},
+        "en_chemin": {"min": 5, "max": 11},
+        "pret": {"min": 12, "max": 99}
+    },
+    "adjustment_rules": [
+        {"id": "cap_ready_if_no_tests", "when": "tests_missing == true and current_level == 'pret'", "set_level": "en_chemin"},
+        {"id": "cap_ready_if_platform_not_chosen", "when": "platform_chosen != true and current_level == 'pret'", "set_level": "en_chemin"},
+        {"id": "cap_ready_if_reception_not_ready", "when": "reception_flow_ready != true and current_level == 'pret'", "set_level": "en_chemin"}
+    ],
+    "actions_catalog": {
+        "explain_calendar_micro": "Expliquer que la réception est obligatoire au 1er septembre 2026 et l’émission au 1er septembre 2027.",
+        "explain_calendar_tpe": "Expliquer que la réception est obligatoire au 1er septembre 2026 et l’émission au 1er septembre 2027.",
+        "explain_calendar_pme": "Expliquer que la réception est obligatoire au 1er septembre 2026 et l’émission au 1er septembre 2027.",
+        "explain_calendar_eti": "Expliquer que réception, émission et e-reporting s’appliquent dès le 1er septembre 2026.",
+        "explain_calendar_ge": "Expliquer que réception, émission et e-reporting s’appliquent dès le 1er septembre 2026.",
+        "explain_franchise_base_scope": "Expliquer le périmètre des obligations pour une entreprise en franchise en base.",
+        "select_platform": "Choisir une plateforme de facturation électronique.",
+        "finalize_platform_selection": "Finaliser le choix de la plateforme.",
+        "configure_reception_flow": "Mettre en place la réception des factures électroniques.",
+        "configure_issuance_flow": "Configurer l’émission des factures électroniques.",
+        "configure_ereporting": "Configurer le e-reporting pour les flux concernés.",
+        "launch_customer_siren_collection": "Collecter le SIREN des clients professionnels.",
+        "complete_customer_siren_collection": "Compléter les données SIREN manquantes dans le fichier clients.",
+        "audit_customer_master_data": "Auditer et fiabiliser les données clients existantes.",
+        "add_operation_nature_to_invoice": "Ajouter la nature de l’opération sur les factures.",
+        "review_invoice_fields": "Revoir les champs de facture gérés par l’outil actuel.",
+        "standardize_delivery_address_capture": "Prévoir la capture et l’affichage de l’adresse de livraison si différente.",
+        "verify_vat_on_debits_obligation": "Vérifier si la mention TVA sur les débits est applicable.",
+        "fix_vat_breakdown_per_rate": "Vérifier que les montants HT/TTC sont ventilés par taux de TVA.",
+        "audit_invoice_tax_fields": "Auditer les champs fiscaux présents sur les factures.",
+        "replace_manual_tooling": "Remplacer Excel/Word par un outil de facturation compatible.",
+        "adopt_digital_invoicing_tool": "Abandonner le papier au profit d’un outil numérique compatible.",
+        "digitize_invoice_flow": "Numériser le flux de création et d’envoi des factures.",
+        "contact_editor_for_compatibility": "Demander à l’éditeur sa feuille de route 2026.",
+        "confirm_editor_roadmap": "Confirmer la feuille de route de l’éditeur et la date de disponibilité.",
+        "plan_tool_migration": "Préparer une migration vers un outil compatible.",
+        "formalize_process": "Formaliser le processus de facturation et les rôles.",
+        "schedule_pilot_tests": "Programmer un test de bout en bout sur un cas réel.",
+        "complete_flow_mapping": "Cartographier les flux de facturation et de paiement.",
+        "finalize_internal_procedures": "Mettre à jour les procédures internes avant l’échéance.",
+        "run_awareness_session": "Informer ou former les équipes concernées.",
+        "reinforce_internal_communication": "Renforcer la communication interne sur les changements à venir.",
+        "clarify_vat_status": "Clarifier le régime TVA de l’entreprise.",
+        "review_crossborder_flows": "Vérifier le traitement des flux UE et hors UE.",
+        "review_ereporting_process": "Identifier les flux relevant du e-reporting.",
+        "ensure_operation_nature_mapping": "Qualifier les opérations en biens, services ou mixtes.",
+        "move_beyond_pdf_only": "Passer d’un simple PDF à une solution de facturation électronique conforme.",
+        "recommend_automation_review": "Étudier l’automatisation et la capacité de traitement pour les volumes élevés.",
+        "prioritize_einvoicing_readiness": "Donner la priorité à la mise en conformité e-invoicing sur les flux B2B France."
+    }
+}
