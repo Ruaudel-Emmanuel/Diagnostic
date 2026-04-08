@@ -1,5 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
-
 # Fiscal Reform Readiness Diagnostic – README
 
 This project is a **questionnaire‑based diagnostic tool** that helps French businesses and accountants assess their readiness for the 2026–2027 electronic invoicing (e‑invoicing) and e‑reporting reform.[^1][^2]
@@ -98,34 +96,5 @@ The `actions_catalog` maps action IDs (e.g. `select_platform`, `configure_erepor
 
 - It does **not generate invoices** or connect directly to PDP/PPF platforms.
 - It does not replace legal or tax advice; it provides a structured, high‑level readiness assessment that should be reviewed with a qualified accountant or tax expert.[^7][^6]
-
-***
-
-If you’d like, I can now draft a **Python example** (pure function or FastAPI endpoint) showing exactly how to load `diagnostic_mapping.json`, process user answers, and return the computed diagnostic.
-
-<div align="center">⁂</div>
-
-[^1]: https://entreprendre.service-public.gouv.fr/actualites/A15683
-
-[^2]: https://www.pennylane.com/fr/fiches-pratiques/facture-electronique/facturation-electronique-dates-cles-et-calendrier
-
-[^3]: https://www.francenum.gouv.fr/guides-et-conseils/pilotage-de-lentreprise/dematerialisation-des-documents/facturation-1
-
-[^4]: https://www.pennylane.com/fr/fiches-pratiques/facture-electronique/reforme-facturation-electronique
-
-[^5]: https://www.kanta.fr/articles/calendrier-de-facture-electronique-2026-2027-les-dates-cles-a-retenir
-
-[^6]: https://bpifrance-creation.fr/encyclopedie/gerer-lentreprise/gestion-financiere-comptable/facturation-electronique-obligation-e
-
-[^7]: https://www.qweeby.fr/les-obligations/il-faut-viser-sept-26-et-pas-27
-
-[^8]: https://www.fiducial.fr/facturation-electronique/faq/mentions-obligatoires-facture-electronique
-
-[^9]: https://www.cerfrance.fr/actualites/les-nouvelles-mentions-obligatoires-sur-vos-factures
-
-[^10]: https://www.portail-autoentrepreneur.fr/academie/gestion-auto-entreprise/facturation/facturation-electronique-2026
-
-[^11]: https://formalites.lesechos.fr/actualites/comment-preparer-son-entreprise-a-l-e-invoicing-obligatoire-d-ici-2026/
-
-[^12]: https://www.cegid.com/fr/blog/facturation-electronique-2024-zoom-sur-le-e-reporting/
+om-sur-le-e-reporting/
 
