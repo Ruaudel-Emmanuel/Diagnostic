@@ -96,5 +96,4 @@ The `actions_catalog` maps action IDs (e.g. `select_platform`, `configure_erepor
 
 - It does **not generate invoices** or connect directly to PDP/PPF platforms.
 - It does not replace legal or tax advice; it provides a structured, high‑level readiness assessment that should be reviewed with a qualified accountant or tax expert.[^7][^6]
-om-sur-le-e-reporting/
 

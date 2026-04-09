@@ -1,0 +1,3 @@
+cat > body.json << 'EOF'
+{"answers":{"Q01":"pme","Q03":"reel_normal","Q05":["b2b_france","b2c_france"],"Q08":"logiciel_facturation","Q09":"pdf_email","Q10":"update_announced","Q12":"partial","Q15":"evaluating","Q16B":"unknown","Q16C":"unknown","Q17":"planned","Q18":"informed_lightly","Q19A":"in_progress","Q19B":"in_progress","Q20":3},"max_actions":3}
+EOF

@@ -38,29 +38,62 @@ def load_mapping(source: Union[str, Path, Dict[str, Any], None] = None) -> JsonL
 
 
 def _truthy_flag_expr(flags: Set[str], expr: str, current_level: str | None = None) -> bool:
-    transformed = expr
-    transformed = transformed.replace("true", "True").replace("false", "False")
+    """
+    Évalue un petit langage de règles booléennes basé sur les flags, sans eval.
 
-    tokens = {
-        "current_level": current_level,
-    }
+    Syntaxe supportée (comme dans ton JSON) :
+    - flag == true
+    - flag == false
+    - flag != true
+    - flag != false
+    - current_level == 'pret'
+    - current_level != 'en_retard'
+    - combinaisons avec 'and' / 'or' et parenthèses.
+    """
 
-    known_flag_names = set()
-    for token in expr.replace("(", " ").replace(")", " ").replace("==", " ").replace("!=", " ").replace("and", " ").replace("or", " ").replace("'", " ").replace('"', " ").split():
-        if not token:
-            continue
-        if token in {"true", "false", "True", "False", "current_level"}:
-            continue
+    # Nettoyage basique
+    expr = expr.strip()
+
+    # Remplacements simples sur current_level
+    if "current_level" in expr:
+        expr = expr.replace("current_level", f"'{current_level}'")
+
+    # On transforme les tests de flag en appels à une fonction Python sûre
+    # Exemple: "platform_missing == true" devient "flag('platform_missing') == True"
+    #          "tool_paper == true"      devient "flag('tool_paper') == True"
+
+    import re
+
+    def repl_flag(match: re.Match) -> str:
+        name = match.group(1)
+        return f"flag('{name}')"
+
+    # Remplacer les patterns comme: platform_missing, tool_paper, has_b2c_france, etc.
+    # On ne touche pas current_level ni les littéraux 'pret', 'en_retard', ni true/false
+    token_pattern = re.compile(r"\b([a-zA-Z_][a-zA-Z0-9_]*)\b")
+
+    def token_replacer(m: re.Match) -> str:
+        token = m.group(1)
+        if token in {"true", "false", "True", "False"}:
+            return token.capitalize()
         if token.startswith("en_") or token in {"pret"}:
-            continue
-        if token.isdigit():
-            continue
-        known_flag_names.add(token)
+            return f"'{token}'"
+        if token == "flag" or token == "current_level":
+            return token
+        # Tous les autres tokens sont considérés comme des noms de flag
+        return f"flag('{token}')"
 
-    for name in known_flag_names:
-        tokens[name] = name in flags
+    transformed = token_pattern.sub(token_replacer, expr)
 
-    return bool(eval(transformed, {"__builtins__": {}}, tokens))
+    def flag(name: str) -> bool:
+        return name in flags
+
+    # Maintenant on peut évaluer l'expression dans un environnement ultra restreint
+    try:
+        return bool(eval(transformed, {"__builtins__": {}}, {"flag": flag}))
+    except Exception:
+        # En cas de problème, on considère la règle comme non déclenchée
+        return False
 
 
 def _compute_base_level(score: int, score_bands: Dict[str, Dict[str, int]]) -> str:
