@@ -39,61 +39,54 @@ def load_mapping(source: Union[str, Path, Dict[str, Any], None] = None) -> JsonL
 
 def _truthy_flag_expr(flags: Set[str], expr: str, current_level: str | None = None) -> bool:
     """
-    Évalue un petit langage de règles booléennes basé sur les flags, sans eval.
-
-    Syntaxe supportée (comme dans ton JSON) :
-    - flag == true
-    - flag == false
-    - flag != true
-    - flag != false
-    - current_level == 'pret'
-    - current_level != 'en_retard'
-    - combinaisons avec 'and' / 'or' et parenthèses.
+    Évalue une petite expression booléenne basée sur les flags et current_level,
+    sans laisser des noms nus comme platform_missing provoquer un NameError.
+    Syntaxe supportée : 'flag == true', 'flag == false', 'and', 'or'.
     """
 
-    # Nettoyage basique
     expr = expr.strip()
 
-    # Remplacements simples sur current_level
+    # Gestion simple de current_level si présent dans l'expression
     if "current_level" in expr:
-        expr = expr.replace("current_level", f"'{current_level}'")
-
-    # On transforme les tests de flag en appels à une fonction Python sûre
-    # Exemple: "platform_missing == true" devient "flag('platform_missing') == True"
-    #          "tool_paper == true"      devient "flag('tool_paper') == True"
-
-    import re
-
-    def repl_flag(match: re.Match) -> str:
-        name = match.group(1)
-        return f"flag('{name}')"
-
-    # Remplacer les patterns comme: platform_missing, tool_paper, has_b2c_france, etc.
-    # On ne touche pas current_level ni les littéraux 'pret', 'en_retard', ni true/false
-    token_pattern = re.compile(r"\b([a-zA-Z_][a-zA-Z0-9_]*)\b")
-
-    def token_replacer(m: re.Match) -> str:
-        token = m.group(1)
-        if token in {"true", "false", "True", "False"}:
-            return token.capitalize()
-        if token.startswith("en_") or token in {"pret"}:
-            return f"'{token}'"
-        if token == "flag" or token == "current_level":
-            return token
-        # Tous les autres tokens sont considérés comme des noms de flag
-        return f"flag('{token}')"
-
-    transformed = token_pattern.sub(token_replacer, expr)
-
-    def flag(name: str) -> bool:
-        return name in flags
-
-    # Maintenant on peut évaluer l'expression dans un environnement ultra restreint
-    try:
-        return bool(eval(transformed, {"__builtins__": {}}, {"flag": flag}))
-    except Exception:
-        # En cas de problème, on considère la règle comme non déclenchée
+        # On ne supporte que des tests du type current_level == 'pret'
+        if f"current_level == 'pret'" in expr or f'current_level == "pret"' in expr:
+            return current_level == "pret"
+        if f"current_level == 'en_chemin'" in expr or f'current_level == "en_chemin"' in expr:
+            return current_level == "en_chemin"
+        if f"current_level == 'en_retard'" in expr or f'current_level == "en_retard"' in expr:
+            return current_level == "en_retard"
+        # Si autre chose, on n'essaie pas d'interpréter
         return False
+
+    # Gestion des cas simples de type: "flag == true", "flag == false"
+    # et combinaisons avec "and"/"or"
+
+    # On découpe d'abord sur ' or '
+    or_parts = [p.strip() for p in expr.split(" or ")]
+
+    def eval_and_part(part: str) -> bool:
+        # Exemple: "platform_missing == true and tool_manual == true"
+        and_parts = [p.strip() for p in part.split(" and ")]
+        for cond in and_parts:
+            if "==" not in cond:
+                return False
+            name, value = [x.strip() for x in cond.split("==", 1)]
+            # value doit être true/false
+            value = value.lower()
+            if value == "true":
+                expected = True
+            elif value == "false":
+                expected = False
+            else:
+                return False
+            # Vérifie si le flag est présent dans l'ensemble
+            actual = (name in flags)
+            if actual != expected:
+                return False
+        return True
+
+    # L'expression entière est vraie si au moins une partie reliée par 'or' est vraie
+    return any(eval_and_part(p) for p in or_parts)
 
 
 def _compute_base_level(score: int, score_bands: Dict[str, Dict[str, int]]) -> str:
