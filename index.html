@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diagnostic facturation électronique</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; line-height: 1.5; }
+    fieldset { margin-bottom: 20px; padding: 16px; }
+    label { display: block; margin: 8px 0 4px; }
+    select, input, button { padding: 8px; width: 100%; max-width: 420px; }
+    .checkbox-group label { display: block; margin: 6px 0; }
+    .result { margin-top: 24px; padding: 16px; border: 1px solid #ccc; }
+    .hidden { display: none; }
+    pre { white-space: pre-wrap; word-break: break-word; }
+  </style>
+</head>
+<body>
+  <h1>Diagnostic de préparation</h1>
+
+  <form id="diagnostic-form">
+    <fieldset>
+      <legend>Profil</legend>
+
+      <label for="Q01">Taille d’entreprise</label>
+      <select id="Q01">
+        <option value="pme">PME</option>
+        <option value="tpe">TPE</option>
+        <option value="micro">Micro</option>
+        <option value="eti">ETI</option>
+        <option value="grande_entreprise">Grande entreprise</option>
+      </select>
+
+      <label for="Q03">Régime TVA</label>
+      <select id="Q03">
+        <option value="reel_normal">Réel normal</option>
+        <option value="reel_simplifie">Réel simplifié</option>
+        <option value="franchise_base">Franchise en base</option>
+        <option value="non_ou_ne_sait_pas">Je ne sais pas</option>
+      </select>
+
+      <label>Mix clients</label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="Q05" value="b2b_france" checked> B2B France</label>
+        <label><input type="checkbox" name="Q05" value="b2c_france"> B2C France</label>
+        <label><input type="checkbox" name="Q05" value="ue"> UE</label>
+        <label><input type="checkbox" name="Q05" value="hors_ue"> Hors UE</label>
+      </div>
+
+      <label for="Q08">Outil de facturation</label>
+      <select id="Q08">
+        <option value="logiciel_facturation">Logiciel de facturation</option>
+        <option value="erp_logiciel_metier">ERP / logiciel métier</option>
+        <option value="excel_word">Excel / Word</option>
+        <option value="papier_carnet">Papier / carnet</option>
+      </select>
+    </fieldset>
+
+    <fieldset>
+      <legend>Préparation</legend>
+
+      <label for="Q10">Compatibilité outil 2026</label>
+      <select id="Q10">
+        <option value="yes_ready">Oui</option>
+        <option value="update_announced">Mise à jour annoncée</option>
+        <option value="unknown">Inconnu</option>
+        <option value="no">Non</option>
+      </select>
+
+      <label for="Q12">SIREN clients pros</label>
+      <select id="Q12">
+        <option value="all">Tous</option>
+        <option value="partial">Partiel</option>
+        <option value="none">Aucun</option>
+        <option value="unknown">Je ne sais pas</option>
+      </select>
+
+      <label for="Q15">Plateforme</label>
+      <select id="Q15">
+        <option value="chosen">Choisie</option>
+        <option value="evaluating">En cours</option>
+        <option value="no">Non</option>
+      </select>
+
+      <label for="Q16B">Réception des factures</label>
+      <select id="Q16B">
+        <option value="yes">Oui</option>
+        <option value="unknown">Inconnu</option>
+        <option value="no">Non</option>
+      </select>
+
+      <label for="Q17">Tests pilotes</label>
+      <select id="Q17">
+        <option value="yes">Oui</option>
+        <option value="planned">Prévus</option>
+        <option value="no">Non</option>
+      </select>
+    </fieldset>
+
+    <button type="submit">Lancer le diagnostic</button>
+  </form>
+
+  <div id="result" class="result hidden">
+    <h2>Résultat</h2>
+    <p><strong>Niveau :</strong> <span id="level"></span></p>
+    <p><strong>Score :</strong> <span id="score"></span></p>
+    <h3>Actions prioritaires</h3>
+    <ul id="actions"></ul>
+    <details>
+      <summary>Détail JSON</summary>
+      <pre id="raw-json"></pre>
+    </details>
+  </div>
+
+  <script>
+    const form = document.getElementById("diagnostic-form");
+    const resultBox = document.getElementById("result");
+    const levelEl = document.getElementById("level");
+    const scoreEl = document.getElementById("score");
+    const actionsEl = document.getElementById("actions");
+    const rawJsonEl = document.getElementById("raw-json");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const q05 = [...document.querySelectorAll('input[name="Q05"]:checked')].map(el => el.value);
+
+      const payload = {
+        answers: {
+          Q01: document.getElementById("Q01").value,
+          Q03: document.getElementById("Q03").value,
+          Q05: q05,
+          Q08: document.getElementById("Q08").value,
+          Q10: document.getElementById("Q10").value,
+          Q12: document.getElementById("Q12").value,
+          Q15: document.getElementById("Q15").value,
+          Q16B: document.getElementById("Q16B").value,
+          Q17: document.getElementById("Q17").value
+        },
+        max_actions: 3
+      };
+
+      try {
+        const response = await fetch("http://162.19.246.165:8000/diagnostic", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(JSON.stringify(data));
+        }
+
+        levelEl.textContent = data.level;
+        scoreEl.textContent = data.score;
+
+        actionsEl.innerHTML = "";
+        (data.top_actions || []).forEach(action => {
+          const li = document.createElement("li");
+          li.textContent = action;
+          actionsEl.appendChild(li);
+        });
+
+        rawJsonEl.textContent = JSON.stringify(data, null, 2);
+        resultBox.classList.remove("hidden");
+      } catch (error) {
+        rawJsonEl.textContent = String(error);
+        resultBox.classList.remove("hidden");
+      }
+    });
+  </script>
+</body>
+</html>
