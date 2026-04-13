@@ -1,4 +1,7 @@
-const API_BASE_URL = "https://api.rennesdev.fr";
+const API_BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://127.0.0.1:8000"
+    : "https://api.rennesdev.fr";
 
 const form = document.getElementById("diagnostic-form");
 const statusEl = document.getElementById("status");
@@ -76,14 +79,25 @@ form.addEventListener("submit", async (event) => {
     renderResult(data);
     statusEl.textContent = "Diagnostic généré avec succès.";
   } catch (error) {
-    resultSection.classList.remove("hidden");
-    resultLevel.textContent = "Erreur";
-    resultLevel.className = "big level-en_retard";
-    resultScore.textContent = "-";
-    resultActions.innerHTML = "<li>Vérifiez que l’API VPS est bien accessible et que le CORS est configuré si nécessaire.</li>";
-    resultJson.textContent = String(error);
-    statusEl.textContent = "Échec de l’appel API.";
-  } finally {
-    submitBtn.disabled = false;
-  }
+  resultSection.classList.remove("hidden");
+  resultLevel.textContent = "Erreur";
+  resultLevel.className = "big level-en_retard";
+  resultScore.textContent = "-";
+  resultActions.innerHTML = "";
+
+  let message = "Une erreur est survenue lors du diagnostic.";
+  try {
+    const parsed = JSON.parse(error.message);
+    if (parsed.detail) {
+      message = Array.isArray(parsed.detail)
+        ? parsed.detail.map(d => d.msg || d).join(" ; ")
+        : parsed.detail;
+    }
+  } catch (_) {}
+
+  statusEl.textContent = message;
+  resultJson.textContent = error.message;
+} finally {
+  submitBtn.disabled = false;
+}
 });
