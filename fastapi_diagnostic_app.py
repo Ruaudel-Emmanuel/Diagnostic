@@ -9,7 +9,10 @@ from diagnostic_engine import compute_diagnostic
 
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+app = FastAPI(
+    title="fiscal-reform-readiness-api",
+    version="1.0.0"
+)
 
 origins = [
     "https://rennesdev.fr",
