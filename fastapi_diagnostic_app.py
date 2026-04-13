@@ -7,13 +7,22 @@ from pydantic import BaseModel, Field
 
 from diagnostic_engine import compute_diagnostic
 
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(
-    title="Fiscal Reform Readiness API",
-    version="1.0.0",
-    description="API for assessing readiness for the French 2026-2027 e-invoicing and e-reporting reform.",
+app = FastAPI()
+
+origins = [
+    "https://rennesdev.fr",
+    "https://www.rennesdev.fr",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
 
 AnswerValue = Union[str, int, List[str]]
 
