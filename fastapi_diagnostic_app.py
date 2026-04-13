@@ -1,13 +1,20 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from diagnostic_engine import compute_diagnostic
 
-from fastapi.middleware.cors import CORSMiddleware
+
+# --- App & CORS ----------------------------------------------------------------
+
+app = FastAPI(
+    title="Fiscal Reform Readiness API",
+    version="1.0.0",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,10 +23,13 @@ app.add_middleware(
         "http://localhost:5173",
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_methods=["*"],
+    allow_headers=["*"],
     max_age=3600,
 )
+
+
+# --- Models --------------------------------------------------------------------
 
 AnswerValue = Union[str, int, List[str]]
 
@@ -27,7 +37,10 @@ AnswerValue = Union[str, int, List[str]]
 class DiagnosticRequest(BaseModel):
     answers: Dict[str, AnswerValue] = Field(
         ...,
-        description="Dictionary of questionnaire answers keyed by question id, e.g. Q01, Q05, Q15.",
+        description=(
+            "Dictionary of questionnaire answers keyed by question id, "
+            "e.g. Q01, Q05, Q15."
+        ),
         examples=[
             {
                 "Q01": "pme",
@@ -44,11 +57,17 @@ class DiagnosticRequest(BaseModel):
                 "Q18": "informed_lightly",
                 "Q19A": "in_progress",
                 "Q19B": "in_progress",
-                "Q20": 3
+                "Q20": 3,
             }
         ],
     )
-    max_actions: int = Field(3, ge=1, le=10, description="Maximum number of recommended actions returned.")
+
+    max_actions: int = Field(
+        3,
+        ge=1,
+        le=10,
+        description="Maximum number of recommended actions returned.",
+    )
 
 
 class DiagnosticResponse(BaseModel):
@@ -70,6 +89,9 @@ class HealthResponse(BaseModel):
     version: str
 
 
+# --- Routes --------------------------------------------------------------------
+
+
 @app.get("/health", response_model=HealthResponse, tags=["system"])
 def health() -> HealthResponse:
     return HealthResponse(
@@ -85,6 +107,19 @@ def create_diagnostic(payload: DiagnosticRequest) -> DiagnosticResponse:
     return DiagnosticResponse(**result)
 
 
+@app.options("/diagnostic", tags=["diagnostic"])
+def options_diagnostic() -> Response:
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "https://fiscale.rennesdev.fr",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Max-Age": "3600",
+        },
+    )
+
+
 @app.get("/", tags=["system"])
 def root() -> Dict[str, Any]:
     return {
@@ -93,7 +128,6 @@ def root() -> Dict[str, Any]:
         "health": "/health",
         "diagnostic": "/diagnostic",
     }
-
 
 # Run locally with:
 # uvicorn fastapi_diagnostic_app:app --host 0.0.0.0 --port 8000 --reload
