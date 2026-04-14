@@ -11,6 +11,7 @@ from diagnostic_engine import compute_diagnostic
 
 # --- App & CORS ----------------------------------------------------------------
 
+
 app = FastAPI(
     title="Fiscal Reform Readiness API",
     version="1.0.0",
@@ -19,7 +20,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://fiscale.rennesdev.fr",
+        "https://rennesdev.fr",
+        "https://www.rennesdev.fr",
         "http://localhost:5173",
     ],
     allow_credentials=True,

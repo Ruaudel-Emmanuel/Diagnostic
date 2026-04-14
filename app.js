@@ -1,7 +1,4 @@
-const API_BASE_URL =
-  window.location.hostname === "localhost"
-    ? "http://127.0.0.1:8000"
-    : "https://api.rennesdev.fr";
+const API_BASE_URL = "/api";
 
 const form = document.getElementById("diagnostic-form");
 const statusEl = document.getElementById("status");
